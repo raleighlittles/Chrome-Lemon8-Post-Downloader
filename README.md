@@ -17,7 +17,7 @@ This is a Chrome extension for downloading [Lemon8](https://en.wikipedia.org/wik
 
 # Usage/Features
 
-Navigate to a specific Instagram post's page, e.g: `https://www.lemon8-app.com/doktoradreamer/7154627074488140289` then click the "Lemon8 Post Downloader" in your browser actions toolbar:
+Navigate to a specific Lemon8 post's page, e.g: `https://www.lemon8-app.com/doktoradreamer/7154627074488140289` then click the "Lemon8 Post Downloader" in your browser actions toolbar:
 
 ![screenshot-of-usage](./docs/browser-action-example.png)
 
