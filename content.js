@@ -7,7 +7,7 @@ chrome.runtime.onMessage.addListener(
         try {
             const appLdJson = JSON.parse(document.querySelector('script[type="application/ld+json"]').innerText);
             const postAuthor = appLdJson.author.name;
-            const uploadDateObj = Date.parse(appLdJson.datePublished);
+            const uploadDateObj = new Date(Date.parse(appLdJson.datePublished));
             
             const postImagesObj = appLdJson.image;
 
@@ -21,7 +21,7 @@ chrome.runtime.onMessage.addListener(
 
         } catch (exception) {
             console.error(`Error using ld+json for Lemon8 extension: ${exception.name}: ${exception.message}`);
-            console.log("Falling back to manual HTML-scrape approach.");
+            console.log("Falling back to manual HTML scrape approach.");
 
             const postAuthor = document.getElementsByClassName("info")[0].innerText;
 
@@ -29,7 +29,7 @@ chrome.runtime.onMessage.addListener(
 
             for (let i = 0; i < postImagesObj.length; i++) {
 
-                const imgFilename = constructDownloadedFilename(postAuthor, null);
+                const imgFilename = constructDownloadedFilename(postAuthor, /* uploadDate */ null);
 
                 // Execute the actual download
                 downloadMediaFromPost(postImagesObj[i].childNodes[0].src, imgFilename);
@@ -56,7 +56,7 @@ chrome.runtime.onMessage.addListener(
             uploadDateObj.getSeconds());
           }
 
-          return "lemon8__".concat(author, "__", timestamp, "__", (uploadDate === undefined) ? "" : constructDateCreatedString(uploadDateObj), "_i.jpg");
+          return "lemon8__".concat(author, "__", timestamp, "__", (uploadDateObj == null) ? "" : constructDateCreatedString(uploadDateObj), "_i.jpg");
       }
     } 
   );
