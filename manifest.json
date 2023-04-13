@@ -1,29 +1,27 @@
 {
     "manifest_version": 3,
-    "name": "Instagram Post downloader",
-    "description": "Saves the contents of the selected Instagram post.",
+    "name": "Lemon8 Post downloader",
+    "description": "Saves the contents of the selected Lemon8 post post.",
     "author": "Raleigh Littles",
-    "homepage_url": "https://github.com/raleighlittles/Chrome-Instagram-Post-Downloader",
+    "homepage_url": "https://github.com/raleighlittles/Chrome-Lemon8-Post-Downloader",
     "version": "0.2",
     "content_scripts": [
       {
         "matches": [
-          "https://www.instagram.com/p/*",
-          "https://www.instagram.com/reel/*",
-          "https://www.instagram.com/tv/*"
+          "https://www.lemon8-app.com/*"
         ],
         "js": ["content.js"]
       }
     ],
-    "icons": { "48":  "icons/icon48.png",
+    "icons": { "48":  "icons/icon96.png",
               "128":  "icons/icon128.png"},
     "background": {
       "service_worker": "background.js"
     },
     "action": {},
     "permissions": [
-      "storage",
       "downloads",
+      "storage",
       "tabs"
   ]
 }

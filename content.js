@@ -4,43 +4,36 @@ chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
       if( request.message === "clicked_browser_action" ) {
 
-          const isUserLoggedIn = (document.querySelector("html").classList[1] !== "not-logged-in");
-          
-          if (isUserLoggedIn) {
+        try {
+            const appLdJson = JSON.parse(document.querySelector('script[type="application/ld+json"]').innerText);
+            const postAuthor = appLdJson.author.name;
+            const uploadDateObj = Date.parse(appLdJson.datePublished);
+            
+            const postImagesObj = appLdJson.image;
 
-            // If the poster is "verified", the string '\nVerified' will be included in this query, so remove it later
-            // TODO: Why does this sometimes not work?
-            const uploaderUsername = document.getElementsByClassName('_aaqt')[0].innerText;
+            for (let i = 0; i < postImagesObj.length; i++) {
 
-            // Looks like: 2022-08-07T20:04:25.000Z
-            const timestampUploaded = new Date(document.getElementsByClassName('_aaqe')[0].dateTime);
+                const imgFilename = constructDownloadedFilename(postAuthor, uploadDateObj);
 
-			const mediaCounterElement = document.getElementsByClassName('_acay');
-			
-			var numMediaInPost;
-			
-            if (mediaCounterElement.length == 0) { // When there is a post with a single image, there is no media counter element (why?)
-				numMediaInPost = 1;
-			}
-			
-			else {
-				numMediaInPost = mediaCounterElement[0].childElementCount;
-			}
-
-            for (var i=0; i < numMediaInPost; i++) {
-
-                const rawImageUrl = document.getElementsByClassName('_aagv')[i].children[0].src;
-
-                console.log("Downloading media from ", rawImageUrl);
-
-                downloadMediaFromPost(rawImageUrl, constructDownloadedFilename((uploaderUsername == null) ? "unknown" : uploaderUsername.split("\n")[0], timestampUploaded, "img"));      
+                // Execute the actual download
+                downloadMediaFromPost(postImagesObj[i]['contentUrl'], imgFilename);
             }
 
-            
-        }
-        else {
-            // TODO: Test if extension still requires login
-            console.error("Extension can't function unless user is logged in");
+        } catch (exception) {
+            console.error(`Error using ld+json for Lemon8 extension: ${exception.name}: ${exception.message}`);
+            console.log("Falling back to manual HTML-scrape approach.");
+
+            const postAuthor = document.getElementsByClassName("info")[0].innerText;
+
+            const postImagesObj = document.getElementsByClassName("sharee-carousel-item current-height");
+
+            for (let i = 0; i < postImagesObj.length; i++) {
+
+                const imgFilename = constructDownloadedFilename(postAuthor, null);
+
+                // Execute the actual download
+                downloadMediaFromPost(postImagesObj[i].childNodes[0].src, imgFilename);
+            }
         }
     }
 
@@ -48,19 +41,22 @@ chrome.runtime.onMessage.addListener(
           chrome.runtime.sendMessage({mediaUrl: mediaUrl, filename: filenameToSaveAs});
       }
 
-      function constructDownloadedFilename(author, uploadDateObj, mediaFmt) {
+      function constructDownloadedFilename(author, uploadDateObj) {
           const today = new Date();
+
           const timestamp = 'DA_'.concat(today.getFullYear(), today.getMonth() + 1, today.getDate(),
                                   'T', today.getHours(), today.getMinutes(), today.getSeconds());
 
-          const uploadDate = 'DC_'.concat(uploadDateObj.getFullYear(),
-              uploadDateObj.getMonth()+1, // getMonth()'s return value is 0-indexed
-              uploadDateObj.getDate(),
-              'T', uploadDateObj.getHours(),
-              uploadDateObj.getMinutes(),
-              uploadDateObj.getSeconds());
+          function constructDateCreatedString(uploadDateObj) {
+            return 'DC_'.concat(uploadDateObj.getFullYear(),
+            uploadDateObj.getMonth()+1, // getMonth()'s return value is 0-indexed
+            uploadDateObj.getDate(),
+            'T', uploadDateObj.getHours(),
+            uploadDateObj.getMinutes(),
+            uploadDateObj.getSeconds());
+          }
 
-          return "instagram__".concat(author, "__", timestamp, "__", uploadDate, (mediaFmt === "vid") ? "_v.mp4" : "_i.jpg");
+          return "lemon8__".concat(author, "__", timestamp, "__", (uploadDate === undefined) ? "" : constructDateCreatedString(uploadDateObj), "_i.jpg");
       }
     } 
   );
