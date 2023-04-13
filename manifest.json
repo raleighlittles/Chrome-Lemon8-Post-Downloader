@@ -1,10 +1,10 @@
 {
     "manifest_version": 3,
     "name": "Lemon8 Post downloader",
-    "description": "Saves the contents of the selected Lemon8 post post.",
+    "description": "Saves the contents of the selected Lemon8 post.",
     "author": "Raleigh Littles",
     "homepage_url": "https://github.com/raleighlittles/Chrome-Lemon8-Post-Downloader",
-    "version": "0.2",
+    "version": "0.1",
     "content_scripts": [
       {
         "matches": [
