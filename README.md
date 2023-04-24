@@ -31,4 +31,5 @@ Downloaded images/video contain the following in the filename, if available:
 
 # Features roadmap
 
-- [ ] Add support for parsing date uploaded 
+- [ ] Add support for downloading videos
+- [ ] Add support for parsing date uploaded
